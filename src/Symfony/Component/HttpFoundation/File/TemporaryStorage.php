@@ -49,33 +49,56 @@ class TemporaryStorage
         $this->secret = $secret;
         $this->size = max((int) $size, 0);
         $this->ttlSec = max((int) $ttlSec, 0);
-
-        $this->removeExpiredFiles();
-    }
-
-    protected function generateHashInfo($token)
-    {
-        return $this->secret.$token;
-    }
-
-    protected function generateHash($token)
-    {
-        return md5($this->generateHashInfo($token));
     }
 
     /**
-     * Creates the directory associated with the given token.
+     * Move an existing file to the temporary storage
      *
-     * The directory is created when it does not exists.
+     * @param File|string $file An exisiting file
      *
-     * @param string $token A token
+     * @return string The token to used to retrieve the file
      *
-     * @return string The directory name
-     *
-     * @throws UnexpectedTypeException if the token is not a string
-     * @throws DirectoryCreationException if the directory does not exist or fails to be created
+     * @throws UnexpectedTypeException if the file is not a filename or an instance of File
+     * @throws FileNotFoundException if the file does not exists
+     * @throws DirectotyCreationException if the target folder could not be created
      */
-    public function getTempDir($token)
+    public function add($file)
+    {
+        $originalFile = $file;
+
+        if (is_string($file)) {
+            $file = new File($file);
+        }
+
+        if (!$file instanceof File) {
+            throw new UnexpectedTypeException($originalFile, 'string or Symfony\Component\HttpFoundation\File\File');
+        }
+
+        // Prevent the temporary storage from getting flooded
+        $this->removeExpiredFiles();
+
+        $token = sprintf("%f%d", microtime(true), rand(100000, 999999));
+        $target = $this->get($token);
+
+        $directory = dirname($target);
+        if (!is_dir($directory)) {
+            if (file_exists($directory) || false === mkdir($directory, 0777, true)) {
+                throw new DirectoryCreationException($directory);
+            }
+        }
+        $file->move($directory, basename($target));
+
+        return $token;
+    }
+
+    /**
+     * Return the path to file in the temporary storage.
+     *
+     * @param string $token The token returned while adding the file to the storage
+     *
+     * @return string The file name
+     */
+    public function get($token)
     {
         if (!is_string($token)) {
             throw new UnexpectedTypeException($token, 'string');
@@ -83,15 +106,9 @@ class TemporaryStorage
 
         $hash = $this->generateHash($token);
 
-        $directory = $this->directory.DIRECTORY_SEPARATOR.substr($hash, 0, 2).DIRECTORY_SEPARATOR.substr($hash, 2);
+        $segments = array($this->directory, substr($hash, 0, 2), substr($hash, 2, 2), substr($hash, 4));
 
-        if (!is_dir($directory)) {
-            if (file_exists($directory) || false === mkdir($directory, 0777, true)) {
-                throw new DirectoryCreationException($directory);
-            }
-        }
-
-        return $directory;
+        return implode(DIRECTORY_SEPARATOR, $segments);
     }
 
     /**
@@ -154,5 +171,15 @@ class TemporaryStorage
         }
 
         return $truncated;
+    }
+
+    protected function generateHashInfo($token)
+    {
+        return $this->secret.$token;
+    }
+
+    protected function generateHash($token)
+    {
+        return md5($this->generateHashInfo($token));
     }
 }
