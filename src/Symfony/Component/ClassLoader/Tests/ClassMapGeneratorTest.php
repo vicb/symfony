@@ -72,35 +72,35 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $data = array(
             array(__DIR__.'/Fixtures/Namespaced', array(
+                'Namespaced\\WithComments' => realpath(__DIR__).'/Fixtures/Namespaced/WithComments.php',
                 'Namespaced\\Bar'          => realpath(__DIR__).'/Fixtures/Namespaced/Bar.php',
                 'Namespaced\\Foo'          => realpath(__DIR__).'/Fixtures/Namespaced/Foo.php',
                 'Namespaced\\Baz'          => realpath(__DIR__).'/Fixtures/Namespaced/Baz.php',
-                'Namespaced\\WithComments' => realpath(__DIR__).'/Fixtures/Namespaced/WithComments.php',
                 )
             ),
             array(__DIR__.'/Fixtures/beta/NamespaceCollision', array(
-                'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
-                'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
                 'NamespaceCollision\\C\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Bar.php',
                 'NamespaceCollision\\C\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Foo.php',
+                'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
+                'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
             )),
             array(__DIR__.'/Fixtures/Pearlike', array(
-                'Pearlike_Foo'          => realpath(__DIR__).'/Fixtures/Pearlike/Foo.php',
-                'Pearlike_Bar'          => realpath(__DIR__).'/Fixtures/Pearlike/Bar.php',
-                'Pearlike_Baz'          => realpath(__DIR__).'/Fixtures/Pearlike/Baz.php',
                 'Pearlike_WithComments' => realpath(__DIR__).'/Fixtures/Pearlike/WithComments.php',
+                'Pearlike_Bar'          => realpath(__DIR__).'/Fixtures/Pearlike/Bar.php',
+                'Pearlike_Foo'          => realpath(__DIR__).'/Fixtures/Pearlike/Foo.php',
+                'Pearlike_Baz'          => realpath(__DIR__).'/Fixtures/Pearlike/Baz.php',
             )),
             array(__DIR__.'/Fixtures/classmap', array(
-                'Foo\\Bar\\A'             => realpath(__DIR__).'/Fixtures/classmap/sameNsMultipleClasses.php',
-                'Foo\\Bar\\B'             => realpath(__DIR__).'/Fixtures/classmap/sameNsMultipleClasses.php',
+                'ClassMap\\SomeClass'     => realpath(__DIR__).'/Fixtures/classmap/SomeClass.php',
+                'ClassMap\\SomeParent'    => realpath(__DIR__).'/Fixtures/classmap/SomeParent.php',
+                'ClassMap\\SomeInterface' => realpath(__DIR__).'/Fixtures/classmap/SomeInterface.php',
                 'A'                       => realpath(__DIR__).'/Fixtures/classmap/multipleNs.php',
                 'Alpha\\A'                => realpath(__DIR__).'/Fixtures/classmap/multipleNs.php',
                 'Alpha\\B'                => realpath(__DIR__).'/Fixtures/classmap/multipleNs.php',
                 'Beta\\A'                 => realpath(__DIR__).'/Fixtures/classmap/multipleNs.php',
                 'Beta\\B'                 => realpath(__DIR__).'/Fixtures/classmap/multipleNs.php',
-                'ClassMap\\SomeInterface' => realpath(__DIR__).'/Fixtures/classmap/SomeInterface.php',
-                'ClassMap\\SomeParent'    => realpath(__DIR__).'/Fixtures/classmap/SomeParent.php',
-                'ClassMap\\SomeClass'     => realpath(__DIR__).'/Fixtures/classmap/SomeClass.php',
+                'Foo\\Bar\\A'             => realpath(__DIR__).'/Fixtures/classmap/sameNsMultipleClasses.php',
+                'Foo\\Bar\\B'             => realpath(__DIR__).'/Fixtures/classmap/sameNsMultipleClasses.php',
             )),
         );
 
@@ -135,14 +135,14 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
         $finder->files()->in(__DIR__ . '/Fixtures/beta/NamespaceCollision');
 
         $this->assertEqualsNormalized(array(
-            'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
-            'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
             'NamespaceCollision\\C\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Bar.php',
             'NamespaceCollision\\C\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Foo.php',
+            'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
+            'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
         ), ClassMapGenerator::createMap($finder));
     }
 
-    protected function assertEqualsNormalized($expected, $actual, $message = null)
+    protected function assertEqualsNormalized(array $expected, array $actual, $message = null)
     {
         foreach ($expected as $ns => $path) {
             $expected[$ns] = strtr($path, '\\', '/');
@@ -151,5 +151,6 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
             $actual[$ns] = strtr($path, '\\', '/');
         }
         $this->assertEquals($expected, $actual, $message);
+        $this->assertEquals(array_keys($expected), array_keys($actual), 'Wrong order - ' + $message);
     }
 }

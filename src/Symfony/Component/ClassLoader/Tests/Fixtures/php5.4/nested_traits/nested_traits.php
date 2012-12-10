@@ -1,7 +1,8 @@
 <?php
 namespace {
-    trait TFooBarBase
+    trait TFooBar2
     {
+        use TFooBar;
     }
 
     trait TFooBar
@@ -9,13 +10,12 @@ namespace {
         use TFooBarBase;
     }
 
-    trait TFooBar2
-    {
-        use TFooBarBase;
-    }
-
     class CFooBar
     {
         use TFooBar;
+    }
+
+    trait TFooBarBase
+    {
     }
 }
