@@ -105,13 +105,20 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
         );
 
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $data[] = array(__DIR__.'/Fixtures/php5.4', array(
-                'TFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
-                'CFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
-                'Foo\\TBar' => __DIR__.'/Fixtures/php5.4/traits.php',
-                'Foo\\IBar' => __DIR__.'/Fixtures/php5.4/traits.php',
-                'Foo\\TFooBar' => __DIR__.'/Fixtures/php5.4/traits.php',
-                'Foo\\CBar' => __DIR__.'/Fixtures/php5.4/traits.php',
+            $data[] = array(__DIR__.'/Fixtures/php5.4/traits', array(
+                'TFoo' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+                'CFoo' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+                'Foo\\TBar' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+                'Foo\\IBar' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+                'Foo\\TFooBar' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+                'Foo\\CBar' => __DIR__.'/Fixtures/php5.4/traits/traits.php',
+            ));
+
+            $data[] = array(__DIR__.'/Fixtures/php5.4/nested_traits', array(
+                'TFooBarBase' => __DIR__.'/Fixtures/php5.4/nested_traits/nested_traits.php',
+                'TFooBar' => __DIR__.'/Fixtures/php5.4/nested_traits/nested_traits.php',
+                'TFooBar2' => __DIR__.'/Fixtures/php5.4/nested_traits/nested_traits.php',
+                'CFooBar' => __DIR__.'/Fixtures/php5.4/nested_traits/nested_traits.php',
             ));
         }
 
